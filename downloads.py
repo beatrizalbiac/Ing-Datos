@@ -18,33 +18,43 @@ if not os.path.exists(path):
     os.makedirs(path)
     print('folder created')
 
-for i in url:
-    response = requests.get(i)
-    filename = os.path.basename(i)
-    fpath = os.path.join(path, filename)
+dfs = []
+# for i in url:
+#     response = requests.get(i)
+#     filename = os.path.basename(i)
+#     fpath = os.path.join(path, filename)
     
 
-    if response.status_code == 200:
-        with open(fpath, 'wb') as file:
-            file.write(response.content)
-        print('File downloaded successfully')
+#     if response.status_code == 200:
+#         with open(fpath, 'wb') as file:
+#             file.write(response.content)
+#         print('File downloaded successfully')
 
-        try:
-            with ZipFile(fpath, 'r') as zip_ref:
-                zip_ref.extractall(path)
-                csv_files = [name for name in zip_ref.namelist() if name.endswith(".csv")]
-            print(f'{filename} extracted successfully')
-        except Exception as e:
-            print(f'Failed to extract {filename}: {e}')
+#         try:
+#             with ZipFile(fpath, 'r') as zip_ref:
+#                 zip_ref.extractall(path)
+#                 csv_files = [name for name in zip_ref.namelist()if name.endswith(".csv") and "__MACOSX" not in name]
+#                 dfs.extend(csv_files)
+#             print(f'{filename} extracted successfully')
+#         except Exception as e:
+#             print(f'Failed to extract {filename}: {e}')
     
-        os.remove(fpath)
-        print('.zip deleted')
+#         os.remove(fpath)
+#         print('.zip deleted')
 
-    else:
-        print('Failed to download file')
-    
-for i in csv_files:
-    csv_path = os.path.join(path, i)
-    df = pd.read_csv(csv_path, encoding="latin1")
-    print(df.head())
-    print('\n')
+#     else:
+#         print('Failed to download file')
+
+# print("\n")
+
+dfs = [f for f in os.listdir(path) if f.endswith(".csv")] #borrar when not testing
+for i in dfs:
+        csv_path = os.path.join(path, i)
+        df = pd.read_csv(csv_path, encoding="latin1")
+        print(f"{i}:")
+        print(df.head())
+        print("\n")
+        print(f"nulls:{df.isnull().sum()}")
+        print("\n")
+# 2020-Q1 -> has different columns
+# 2019-Q2 -> doesn't have any correlations with the others (it's unusable)
