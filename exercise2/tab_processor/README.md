@@ -31,4 +31,7 @@ that his lyrics have. Do it also globally, but with the top 20 **NOT IMPLEMENTED
 4. Create a Python file that executes all modules in order. It has to have his own log file,
 and make sure that if any of the processes fail, is registered there **NOT IMPLEMENTED**
 
+
+
+## Conclusion:
 There were many external problems while I was trying to do this project, so there are many things that couldn't be implemented or documented properly, and I apologize for it
