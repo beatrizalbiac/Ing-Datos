@@ -39,7 +39,6 @@ def list_files_recursive(path="."):
         full_path = os.path.join(path, entry)
 
         if os.path.basename(full_path) == "catalog.json": #added so it skips the catalog
-            input("Skipping upper catalog directory. Press Enter to continue...") 
             continue
 
         if os.path.isdir(full_path):
