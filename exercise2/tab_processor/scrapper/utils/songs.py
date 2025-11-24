@@ -191,15 +191,14 @@ def get_songs(output_directory: str, version: int = 0):
     
     catalog = files.load_from_json(Path(f"{output_directory}/catalog.json"))
     for artist in catalog:
-        dir = (artist["name"][:1]).lower()
         for song in artist["songs"]:
             song_name=song["song_title"]
             song_url=song["song_url"]
-            song_file_path = song["lyrics_path"].replace("files/songs/",f"files/songs/{dir}/")
+            song_file_path = song["lyrics_path"].replace("files/songs/",f"files/songs/")
 
             try:
                     if get_song_lyrics(song_name, song_url, song_file_path):
-                        time.sleep(0.5)  # Be polite and avoid hammering the server
+                        time.sleep(0.5)
                     else:
                         log.info(
                             f"Skipping download for existing file: {song_file_path}"
