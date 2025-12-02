@@ -90,7 +90,7 @@ def clean_lyrics(source: Path, destination: Path) -> str:
 
 def process_all():
     if not INPUT_DIR_VAL_OK.exists():
-        print(f"[lyrics] Directory {INPUT_DIR_VAL_OK} doesn't exist.")
+        print(f"Directory {INPUT_DIR_VAL_OK} doesn't exist.")
         return
 
     count = 0

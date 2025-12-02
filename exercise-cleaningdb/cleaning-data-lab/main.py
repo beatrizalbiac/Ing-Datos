@@ -4,6 +4,9 @@ DATA CLEANING EXERCISE
 Retrieve, explore, and clean an e-commerce customer orders dataset
 """
 from datetime import datetime
+import pandas as pd
+import requests
+import io
 
 print("=" * 70)
 print("DATA CLEANING EXERCISE - E-COMMERCE CUSTOMER ORDERS")
