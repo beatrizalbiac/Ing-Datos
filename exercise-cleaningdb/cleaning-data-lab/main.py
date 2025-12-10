@@ -42,11 +42,13 @@ except Exception as e:
     print(f"✗ Error: {e}")
     raise e
 
+df_raw = df.copy()
+
 # ============================================================================
 # STEP 2: INITIAL EXPLORATION
 # ============================================================================
 
-print("STEP 2: INITIAL DATA EXPLORATION")
+print("\nSTEP 2: INITIAL DATA EXPLORATION")
 print("-" * 70)
 print(f"\nDataset Shape: {df.shape}")
 print(f"\nColumn Names & Types:\n{df.dtypes}")
@@ -74,7 +76,23 @@ if df[df.duplicated(subset=['OrderID'], keep=False)].shape[0] > 0:
 print("\nSTEP 4: DATA CLEANING")
 print("-" * 70)
 
+print("RULES:\n")
+print("- CustomerName: Standarize the font (capitals and lowercase letters) -> So the first letter of the name and lastname is capitalized, and the rest is in lowercase\n" \
+"- Email: Standarize the font -> so everything's on lowecase\n" \
+"- Phone: Erase everything that isn't a number\n" \
+"- Country: Standarize it so the same country is refered to with the same format and wording\n" \
+"- OrderDate: Standarize it to DD/MM/YYYY so every date has the same format\n" \
+"- Quantity: Has to be greater than 0\n" \
+"- Price: Has to be greater than 0\n" \
+"- CustomerAge: Has to be a number between 1 and 100\n" \
+"- OrderStatus: It's already clean and standarized\n")
+
+print("NULLS:\n")
+print("- Drop rows with null Quantity or Price\n" \
+"- Drop rows with BOTH null Email and Phone\n")
+
 df["CustomerName"] = df["CustomerName"].str.title() # so every name and lastname has the same format. Idrk what to do w antonio tho (he doens't have a lastname)
+
 df["Email"] = df["Email"].str.lower()
 
 df["Phone"] = df["Phone"].str.replace(r"\D", "", regex=True) # it looks at the data and removes anything that isn't a number (-, " ",invalid...), that's what /D does
@@ -102,7 +120,7 @@ mask = df["OrderDate"].str.match(r"^\d{4}/\d{2}/\d{2}$") # to standarize YYYY/MM
 df["OrderDate"] = (
     pd.to_datetime(df["OrderDate"].where(mask), format="%Y/%m/%d", errors="coerce")
     .fillna(pd.to_datetime(df["OrderDate"].where(~mask), dayfirst=False, errors="coerce")) # it implies that every date that isn't YYYY first is MM first (even smth like 04/01) for simplicity
-    .dt.strftime("%d/%m/%Y") # the format should be left as DD/MM/YYYY (the superior way)
+    .dt.strftime("%Y/%m/%d") # the format should be left as YYYY/MM/DD. I'd prefer DD/MM/YYYY but that creates problems later on
 )
 
 df.loc[df["Quantity"] <= 0, "Quantity"] = np.nan
@@ -119,10 +137,9 @@ df["CustomerAge"] = df["CustomerAge"].astype("Int64") # it's so they don't look 
 
 # order status is already standardized and clean (it has no nulls)
 
-print(df.head(10))
-print("\n")
+print(f"\nCleaned dataset snippet:\n{df.head(10)}\n")
 
-print(df.isna().sum())
+print(f"After format cleaning:\n{df.isna().sum()}")
 
 # handle nulls:
 
@@ -130,31 +147,72 @@ df = df.dropna(subset=["Quantity", "Price"])
 
 df = df.dropna(subset=["Email", "Phone"], how="all") # if there were any where both the phone and email where missing it'd drop them
 
-print(df.isna().sum())
-print(df.shape)
-
-
+print(f"\nAfter null cleaning:\n{df.isna().sum()}")
+print(f"\nFinal shape:{df.shape}")
 
 # ============================================================================
 # STEP 5: FINAL VALIDATION
 # ============================================================================
 
-print("STEP 4: FINAL VALIDATION")
+print("\nSTEP 5: FINAL VALIDATION")
 print("-" * 70)
+
+def validation(df):
+    total = len(df)
+
+    # to avoid errors and warnings bc of conflicting types
+    email = df["Email"].astype("string")
+    country = df["Country"].astype("string")
+    age = pd.to_numeric(df["CustomerAge"], errors="coerce")s
+    order_date = pd.to_datetime(df["OrderDate"], format="%Y/%m/%d", errors="coerce")
+
+    accuracy_mask = age.between(1, 100) # bc ages should be realistic
+
+    completeness_mask = email.notna() & (email.str.strip() != "") # based on the ppt, but not so aplicable bc of the rules i set in place (like that u can have a missing email if u have a valid phone number)
+
+    consistency_mask = country.isin([ # so USA/UK/etc aren't written in multiple ways
+        "USA", "Canada", "UK",
+        "usa", "us", "united states",
+        "united kingdom", "uk", "gb"
+    ])
+
+    validity_mask = email.notna() & email.str.contains("@", na=False) # to check format
+
+    uniqueness_mask = ~df["OrderID"].duplicated(keep=False) # unique id. the ~ is to get everithing but the variable after the symbol
+
+    timeliness_mask = order_date.dt.year == 2023 # kinda picked by hand (just following the csv data kinda)
+
+    results = { # % rows that pass each dimension test
+        "Accuracy": accuracy_mask.sum() / total,
+        "Completeness": completeness_mask.sum() / total,
+        "Consistency": consistency_mask.sum() / total,
+        "Validity": validity_mask.sum() / total,
+        "Uniqueness": uniqueness_mask.sum() / total,
+        "Timeliness": timeliness_mask.sum() / total,
+    }
+
+    for k, v in results.items(): # prints the percentages
+        print(f"{k:12s}: {v:.2%}")
+
+    print("\n")
+    return results
+
+
+raw_results = validation(df_raw)
+clean_results = validation(df)
+
+print("\nComparison:") # raw vs cleaned side by side
+print(f"{'':12s}  {'RAW':>8s}  {'CLEAN':>8s}")
+for dim in raw_results:
+    print(f"{dim:12s}: {raw_results[dim]:>8.2%}  {clean_results[dim]:>8.2%}")
 
 # ============================================================================
 # STEP 6: SAVE CLEANED DATA
 # ============================================================================
 
-print("STEP 6: SAVING DATA")
+print("\nSTEP 6: SAVE DATASET")
 print("-" * 70)
 
 df.to_csv('dfcleaned.csv', index=False)
 print("dataset saved")
 
-# ============================================================================
-# SUMMARY
-# ============================================================================
-
-
-print(f"Completed at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
