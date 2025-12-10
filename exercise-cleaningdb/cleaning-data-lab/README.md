@@ -4,10 +4,13 @@
 
 ### 1. Check the file data to fast check. Read it with Pandas
 - **How many rows do we have?**
+  
   189 rows
 - **Is there any sensible information?**
+  
   Yes, the name, email, phone number and age
 - **What kind of problems can we have regarding the nature of this data?**
+  
   Inconsistent formats, invalid values, missing data etc.
 
 ### 2. Clean it
