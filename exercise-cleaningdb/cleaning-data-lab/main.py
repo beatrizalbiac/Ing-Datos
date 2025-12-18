@@ -163,7 +163,7 @@ def validation(df):
     # to avoid errors and warnings bc of conflicting types
     email = df["Email"].astype("string")
     country = df["Country"].astype("string")
-    age = pd.to_numeric(df["CustomerAge"], errors="coerce")s
+    age = pd.to_numeric(df["CustomerAge"], errors="coerce")
     order_date = pd.to_datetime(df["OrderDate"], format="%Y/%m/%d", errors="coerce")
 
     accuracy_mask = age.between(1, 100) # bc ages should be realistic

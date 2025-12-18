@@ -1,0 +1,178 @@
+/home/vbarcelo/repos/usj-ai-de-class/student-repos/beatriz-albiac/exercise-cleaningdb/cleaning-data-lab/main.py:34: ParserWarning: Skipping line 6: expected 10 fields, saw 11
+
+  df = pd.read_csv(io .StringIO(response.text),sep=',',on_bad_lines='warn') # the line 1005 is a "bad line" so it doesn't import it
+======================================================================
+DATA CLEANING EXERCISE - E-COMMERCE CUSTOMER ORDERS
+======================================================================
+Started at: 2025-12-12 13:38:19
+
+STEP 1: RETRIEVING DATA FROM WEB SOURCE
+----------------------------------------------------------------------
+Fetching data from: https://raw.githubusercontent.com/victorbrub/data-engineering-class/refs/heads/main/pre-post_processing/exercise.csv
+✓ Data fetched from web source, loading into DataFrame...
+✓ Data retrieved successfully!
+✓ Status Code: 200
+✓ Rows: 189, Columns: 10
+
+   OrderID   CustomerName              Email  ...  Price CustomerAge OrderStatus
+0     1001       John Doe     john@email.com  ...  19.99          28   Completed
+1     1002     jane smith     JANE@GMAIL.COM  ...  49.99          35   Completed
+2     1003       john doe     john@email.com  ...  19.99          28   Completed
+3     1004    Bob Johnson   bob.j@email.com   ...  99.99          45     Pending
+4     1006  Charlie Davis                NaN  ...  79.99     unknown   Completed
+
+[5 rows x 10 columns]
+
+STEP 2: INITIAL DATA EXPLORATION
+----------------------------------------------------------------------
+
+Dataset Shape: (189, 10)
+
+Column Names & Types:
+OrderID           int64
+CustomerName     object
+Email            object
+Phone            object
+Country          object
+OrderDate        object
+Quantity          int64
+Price           float64
+CustomerAge      object
+OrderStatus      object
+dtype: object
+
+First 5 Rows:
+   OrderID   CustomerName              Email  ...  Price CustomerAge OrderStatus
+0     1001       John Doe     john@email.com  ...  19.99          28   Completed
+1     1002     jane smith     JANE@GMAIL.COM  ...  49.99          35   Completed
+2     1003       john doe     john@email.com  ...  19.99          28   Completed
+3     1004    Bob Johnson   bob.j@email.com   ...  99.99          45     Pending
+4     1006  Charlie Davis                NaN  ...  79.99     unknown   Completed
+
+[5 rows x 10 columns]
+
+Missing Values:
+OrderID          0
+CustomerName     0
+Email           24
+Phone            5
+Country          0
+OrderDate        0
+Quantity         0
+Price           21
+CustomerAge      2
+OrderStatus      0
+dtype: int64
+
+Total Missing: 52
+
+STEP 3: DATA QUALITY ISSUES
+----------------------------------------------------------------------
+Duplicates: 0
+Duplicate OrderIDs: 0
+
+STEP 4: DATA CLEANING
+----------------------------------------------------------------------
+RULES:
+
+- CustomerName: Standarize the font (capitals and lowercase letters) -> So the first letter of the name and lastname is capitalized, and the rest is in lowercase
+- Email: Standarize the font -> so everything's on lowecase
+- Phone: Erase everything that isn't a number
+- Country: Standarize it so the same country is refered to with the same format and wording
+- OrderDate: Standarize it to DD/MM/YYYY so every date has the same format
+- Quantity: Has to be greater than 0
+- Price: Has to be greater than 0
+- CustomerAge: Has to be a number between 1 and 100
+- OrderStatus: It's already clean and standarized
+
+NULLS:
+
+- Drop rows with null Quantity or Price
+- Drop rows with BOTH null Email and Phone
+
+Country
+usa               93
+us                31
+canada            26
+united kingdom    22
+united states      7
+uk                 7
+gb                 3
+Name: count, dtype: int64
+
+
+
+Cleaned dataset snippet:
+   OrderID    CustomerName  ... CustomerAge  OrderStatus
+0     1001        John Doe  ...          28    Completed
+1     1002      Jane Smith  ...          35    Completed
+2     1003        John Doe  ...          28    Completed
+3     1004     Bob Johnson  ...          45      Pending
+4     1006   Charlie Davis  ...        <NA>    Completed
+5     1007    David Miller  ...        <NA>   Processing
+6     1008      Eve Wilson  ...          29    Completed
+7     1009    Frank Thomas  ...        <NA>     Returned
+8     1010       Grace Lee  ...          31    Completed
+9     1011  Henry Martinez  ...          48    Cancelled
+
+[10 rows x 10 columns]
+
+After format cleaning:
+OrderID          0
+CustomerName     0
+Email           24
+Phone           33
+Country          0
+OrderDate        0
+Quantity        44
+Price           21
+CustomerAge     98
+OrderStatus      0
+dtype: int64
+
+After null cleaning:
+OrderID          0
+CustomerName     0
+Email           14
+Phone           21
+Country          0
+OrderDate        0
+Quantity         0
+Price            0
+CustomerAge     62
+OrderStatus      0
+dtype: int64
+
+Final shape:(124, 10)
+
+STEP 5: FINAL VALIDATION
+----------------------------------------------------------------------
+Accuracy    : 48.15%
+Completeness: 87.30%
+Consistency : 68.25%
+Validity    : 87.30%
+Uniqueness  : 100.00%
+Timeliness  : 17.99%
+
+
+Accuracy    : 50.00%
+Completeness: 88.71%
+Consistency : 100.00%
+Validity    : 88.71%
+Uniqueness  : 100.00%
+Timeliness  : 100.00%
+
+
+
+Comparison:
+                   RAW     CLEAN
+Accuracy    :   48.15%    50.00%
+Completeness:   87.30%    88.71%
+Consistency :   68.25%   100.00%
+Validity    :   87.30%    88.71%
+Uniqueness  :  100.00%   100.00%
+Timeliness  :   17.99%   100.00%
+
+STEP 6: SAVE DATASET
+----------------------------------------------------------------------
+dataset saved
