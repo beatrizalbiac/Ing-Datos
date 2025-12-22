@@ -1,6 +1,7 @@
 import os
 import requests
 from zipfile import ZipFile
+import pandas as pd
 
 url=[
     "https://divvy-tripdata.s3.amazonaws.com/Divvy_Trips_2018_Q4.zip",
@@ -15,7 +16,7 @@ url=[
 path = "./downloads"
 if not os.path.exists(path):
     os.makedirs(path)
-    print('folder created')
+    print("folder created")
 
 dfs = []
 for i in url:
@@ -25,21 +26,27 @@ for i in url:
     
 
     if response.status_code == 200:
-        with open(fpath, 'wb') as file:
+        with open(fpath, "wb") as file:
             file.write(response.content)
-        print('File downloaded successfully')
+        print("File downloaded successfully")
 
         try:
-            with ZipFile(fpath, 'r') as zip_ref:
+            with ZipFile(fpath, "r") as zip_ref:
                 zip_ref.extractall(path)
                 csv_files = [name for name in zip_ref.namelist()if name.endswith(".csv") and "__MACOSX" not in name]
                 dfs.extend(csv_files)
-            print(f'{filename} extracted successfully')
+            print(f"{filename} extracted successfully")
         except Exception as e:
-            print(f'Failed to extract {filename}: {e}')
+            print(f"Failed to extract {filename}: {e}")
     
         os.remove(fpath)
-        print('.zip deleted')
+        print(".zip deleted\n")
 
     else:
-        print('Failed to download file')
+        print("Failed to download file")
+
+dfs = [f for f in os.listdir(path) if f.endswith(".csv")] #erase when not testing
+for i in dfs:
+    csv_path = os.path.join(path, i)
+    df = pd.read_csv(csv_path, encoding="latin1")
+    print(f"{i}:\n{df.head()}\n")
