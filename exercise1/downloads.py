@@ -44,8 +44,9 @@ for i in url:
 
     else:
         print("Failed to download file")
-
-dfs = [f for f in os.listdir(path) if f.endswith(".csv")] #erase when not testing
+print("\n")
+# just to see whats in the csvs
+dfs = [f for f in os.listdir(path) if f.endswith(".csv")]
 for i in dfs:
     csv_path = os.path.join(path, i)
     df = pd.read_csv(csv_path, encoding="latin1")
