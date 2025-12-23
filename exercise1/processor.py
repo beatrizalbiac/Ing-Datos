@@ -39,6 +39,7 @@ map_2019_Q2 = {
     "05 - Member Details Member Birthday Year": "birthyear"
 }
 
+# just renaming them, they match perfectly
 dataframes["Divvy_Trips_2019_Q2.csv"] = dataframes["Divvy_Trips_2019_Q2.csv"].rename(columns=map_2019_Q2)
 print(f"Divvy_Trips_2019_Q2.csv: \n{dataframes["Divvy_Trips_2019_Q2.csv"].head()}\n")
 
@@ -54,11 +55,12 @@ map_2020_Q1 = {
 }
 
 df = dataframes["Divvy_Trips_2020_Q1.csv"] # so it's easier to call it, just for this bit
+# in this case there must have been some change in nomenclature bc there are many changes. I decided to keep the older version as it's just one csv with these changes. If there were more I'd prefer to keep the new one, as theres less room for nulls
 df = df.rename(columns=map_2020_Q1)
 
 for i in target:
     if i not in df.columns:
-        df[i] = pd.NA
+        df[i] = pd.NA # just fill the new columns with nulls, they aren't used in this code later on anyways
 
 df = df[target]
 
@@ -84,6 +86,7 @@ dataframes["Divvy_Trips_2020_Q1.csv"]["usertype"] = dataframes["Divvy_Trips_2020
 print("\n")
 print(dataframes["Divvy_Trips_2020_Q1.csv"].head())
 
+# final processing process
 print("\nFinal processed dfs:\n")
 for i in dataframes:
     # to erase the "," that appear in some tripdurations
