@@ -1,6 +1,7 @@
-# Exsericse 1
+# Exercise 1 - Downloading Files with Python.
 *by Beatriz Albiac*
 
+## Things to be implemented:
 1. Create the directory ‘downloads’ if it doesn't exist. Download the files one by one. Split out the filename from the url, so the file keeps its original filename.
 
   There's an url that has a typo and doesn't get downloaded: *https://divvy-tripdata.s3.amazonaws.com/Divvy_Trips_2220_Q1.zip*
@@ -9,18 +10,23 @@
   
 2. Each file is a zip, extract the csv from the zip and delete the zip file.
 3.  Look at the data you downloaded:
+
     a) What kind of data is?
     
     ajkdsklljasdkj
+    
     b) Can you think of analyses that can be made with this?
     
     asldkñalsd
+    
     c) Is the data normalized or denormalized?
     
     asldklñsa
+    
     d) It’s needed any processing before we use it?
     
     aslñdñasl
+    
     e) Are there null values? In which fields? Measure how many and guess a reason
     
     sklajfklds
