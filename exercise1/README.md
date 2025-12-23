@@ -1,29 +1,6 @@
 # Exsericse 1
 *by Beatriz Albiac*
 
-1. Create the directory ‘downloads’ if it doesn't exist. Download the files one by one.
-Split out the filename from the uri, so the file keeps its original filename.
-nnbnv
-2. Each file is a zip, extract the csv from the zip and delete the zip file.
-3. Look at the data you downloaded.
-a. What kind of data is?
-i. The data downloaded belongs to…
-b. Can you think of analyses that can be made with this?
-i. Looking at the fields of the data one can infer…
-c. Is the data normalized or denormalized?
-d. It’s needed any processing before we use it?
-e. Are there null values? In which fields? Measure how many and guess a
-reason.
-4. Get the mean trip time for each quarter. Track how it evolves over time. For this,
-create a new file that reads the downloads directory and computes the mean. This
-file can be called ‘processor.py’, and the output should be another folder called
-‘processed’.
-5. Propose and develop any extra analysis you consider. You can use any visualization
-tool from python, or any external free tool like Google Data Studio. Focus on the
-columns of the file.
-6. EXTRA: download the files asynchronously.
-7. Think of the need of delivery the data. How you will do it?
-
 1. Create the directory ‘downloads’ if it doesn't exist. Download the files one by one. Split out the filename from the url, so the file keeps its original filename.
 
   There's an url that has a typo and doesn't get downloaded: *https://divvy-tripdata.s3.amazonaws.com/Divvy_Trips_2220_Q1.zip*
@@ -33,23 +10,29 @@ columns of the file.
 2. Each file is a zip, extract the csv from the zip and delete the zip file.
 3.  Look at the data you downloaded:
     a) What kind of data is?
+    
     ajkdsklljasdkj
     b) Can you think of analyses that can be made with this?
+    
     asldkñalsd
     c) Is the data normalized or denormalized?
+    
     asldklñsa
     d) It’s needed any processing before we use it?
+    
     aslñdñasl
     e) Are there null values? In which fields? Measure how many and guess a reason
+    
     sklajfklds
 
-4. Get the mean trip time for each quarter. Track how it evolves over time. For this,
+5. Get the mean trip time for each quarter. Track how it evolves over time. For this,
 create a new file that reads the downloads directory and computes the mean. This
 file can be called ‘processor.py’, and the output should be another folder called
 ‘processed’
-5. Propose and develop any extra analysis you consider. You can use any visualization
+6. Propose and develop any extra analysis you consider. You can use any visualization
 tool from python, or any external free tool like Google Data Studio. Focus on the
 columns of the file.
-6. EXTRA: download the files asynchronously **NOT IMPLEMENTED**
-7. Think of the need of delivery the data. How you will do it?
-fdfgdshfdgfdh
+7. EXTRA: download the files asynchronously **NOT IMPLEMENTED**
+8. Think of the need of delivery the data. How you will do it?
+
+   fdfgdshfdgfdh
