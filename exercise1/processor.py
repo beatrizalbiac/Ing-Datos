@@ -55,6 +55,11 @@ map_2020_Q1 = {
 }
 
 df = dataframes["Divvy_Trips_2020_Q1.csv"] # so it's easier to call it, just for this bit
+
+# deal with the ONE null row before changing anything
+df = df.dropna()
+print(f"{i}:\n{df.isnull().sum()}\n")
+
 # in this case there must have been some change in nomenclature bc there are many changes. I decided to keep the older version as it's just one csv with these changes. If there were more I'd prefer to keep the new one, as theres less room for nulls
 df = df.rename(columns=map_2020_Q1)
 
