@@ -5,7 +5,9 @@
 1. Create the directory ‘downloads’ if it doesn't exist. Download the files one by one. Split out the filename from the url, so the file keeps its original filename.
   
    There's an url that has a typo and doesn't get downloaded: *https://divvy-tripdata.s3.amazonaws.com/Divvy_Trips_2220_Q1.zip*
+
    I took the decision to ignore it, as it can be determined that it should be 2020 or 2022, but the "Q1" is pretty clear. So deciding on either of those options would either make it so a csv is duplicated, or break the continuity of que quarters.
+
    The optimal way would be to change it to "2020_Q2" but that'd be me making things up.
   
 4. Each file is a zip, extract the csv from the zip and delete the zip file.
