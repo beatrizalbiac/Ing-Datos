@@ -10,7 +10,7 @@ url=[
     "https://divvy-tripdata.s3.amazonaws.com/Divvy_Trips_2019_Q3.zip",
     "https://divvy-tripdata.s3.amazonaws.com/Divvy_Trips_2019_Q4.zip",
     "https://divvy-tripdata.s3.amazonaws.com/Divvy_Trips_2020_Q1.zip",
-    "https://divvy-tripdata.s3.amazonaws.com/Divvy_Trips_2220_Q1.zip" # it's wrong it should be 2020
+    "https://divvy-tripdata.s3.amazonaws.com/Divvy_Trips_2220_Q1.zip" # it's wrong so it doesn't get downloaded
 ]
 
 path = "./downloads"
