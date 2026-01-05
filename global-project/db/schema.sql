@@ -43,7 +43,8 @@ CREATE TABLE IF NOT EXISTS dim_moves (
 CREATE TABLE IF NOT EXISTS fact_pokemon_moves (
   pokemon_id INTEGER NOT NULL REFERENCES dim_pokemon(pokemon_id),
   move_id INTEGER NOT NULL REFERENCES dim_moves(move_id),
-  is_stab INTEGER NOT NULL DEFAULT 0, -- it's a pokemon mechanic where if the type of the move is the same as the type of the pokemon it has an increment on damage (I think its a 50% increment). SQLite uses 0/1 for boolean
+  is_stab INTEGER NOT NULL DEFAULT 0 CHECK (is_stab IN (0,1)), -- it's a pokemon mechanic where if the type of the move is the same as the type of the pokemon it has an increment on damage (I think its a 50% increment). SQLite uses 0/1 for boolean
+  -- It should be a boolean but sqlite doesn't have them
   PRIMARY KEY (pokemon_id, move_id)
 );
 
