@@ -1,7 +1,7 @@
 # code based on https://www.geeksforgeeks.org/python/how-to-execute-a-script-in-sqlite-using-python/
 import sqlite3
 
-con = sqlite3.connect("dwh.db")
+con = sqlite3.connect("./db/data/dwh.db")
 
 cur = con.cursor()
 
