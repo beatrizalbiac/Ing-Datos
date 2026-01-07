@@ -1,8 +1,8 @@
 import pandas as pd
 import ast
 
-df_pokemon = pd.read_csv('db/data/raw/pokemon_data.csv', sep=';')
-df_moves = pd.read_csv('db/data/raw/move_data.csv')
+df_pokemon = pd.read_csv('db/data/raw/pokemon_raw.csv', sep=';')
+df_moves = pd.read_csv('db/data/raw/move_raw.csv')
 
 # I'll parse the columns that are saved as lists
 df_pokemon['Types_parsed'] = df_pokemon['Types'].apply(lambda x: ast.literal_eval(x))
