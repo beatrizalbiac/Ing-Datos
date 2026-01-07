@@ -37,5 +37,5 @@ for i in urls:
         print(f"error: {e}")
         raise e
     
-df_pokemon.to_csv('db/data/raw/pokemon_data.csv', index=False, sep=';')
-df_moves.to_csv('db/data/raw/move_data.csv', index=False)
+df_pokemon.to_csv('db/data/raw/pokemon_raw.csv', index=False, sep=';')
+df_moves.to_csv('db/data/raw/move_raw.csv', index=False)
