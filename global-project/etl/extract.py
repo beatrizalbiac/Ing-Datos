@@ -19,11 +19,11 @@ for i in urls:
         print("Data fetched from web source, loading into DataFrame...")
 
         if "pokemon-data.csv" in i:
-            sep = ';'
+            sep = ";"
         elif "move-data.csv" in i:
-            sep = ','
+            sep = ","
         
-        df = pd.read_csv(io.StringIO(response.text), sep=sep, on_bad_lines='warn')
+        df = pd.read_csv(io.StringIO(response.text), sep=sep, on_bad_lines="warn")
 
         if "pokemon-data.csv" in i:
             df_pokemon = df
@@ -37,5 +37,5 @@ for i in urls:
         print(f"error: {e}")
         raise e
     
-df_pokemon.to_csv('db/data/raw/pokemon_raw.csv', index=False, sep=';')
-df_moves.to_csv('db/data/raw/move_raw.csv', index=False)
+df_pokemon.to_csv("db/data/raw/pokemon_raw.csv", index=False, sep=";")
+df_moves.to_csv("db/data/raw/move_raw.csv", index=False)
