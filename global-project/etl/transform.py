@@ -5,18 +5,24 @@ df_pokemon = pd.read_csv('db/data/raw/pokemon_raw.csv', sep=';')
 df_moves = pd.read_csv('db/data/raw/move_raw.csv')
 
 # I'll parse the columns that are saved as lists
-df_pokemon['Types_parsed'] = df_pokemon['Types'].apply(lambda x: ast.literal_eval(x))
-df_pokemon['Abilities_parsed'] = df_pokemon['Abilities'].apply(lambda x: ast.literal_eval(x))
-df_pokemon['Moves_parsed'] = df_pokemon['Moves'].apply(lambda x: ast.literal_eval(x))
+df_pokemon["Types"] = df_pokemon["Types"].apply(ast.literal_eval)
+df_pokemon["Abilities"] = df_pokemon["Abilities"].apply(ast.literal_eval)
+df_pokemon["Moves"] = df_pokemon["Moves"].apply(ast.literal_eval)
+df_pokemon["Next Evolution(s)"] = df_pokemon["Next Evolution(s)"].apply(ast.literal_eval)
 
-# to fix the - vs ' thing so it's the same accross all data
-fixes = {"Forest-s Curse": "Forest's Curse", "King-s Shield": "King's Shield", 
-             "Land-s Wrath": "Land's Wrath", "Nature-s Madness": "Nature's Madness"}
-df_pokemon['Moves_parsed'] = df_pokemon['Moves_parsed'].apply(lambda moves: [fixes.get(m, m) for m in moves])
+# to fix the - vs ' thing so it's the same accross all data 
+df_pokemon["Moves"] = df_pokemon["Moves"].apply(
+    lambda moves: [m.replace("'", "-") for m in moves]
+)
 
 df_pokemon['total_stats'] = df_pokemon[['HP', 'Attack', 'Defense', 'Special Attack', 'Special Defense', 'Speed']].sum(axis=1)
 
-df_pokemon.to_csv('db/data/processed/pokemon.csv', index=False)
-df_moves.to_csv('db/data/processed/moves.csv', index=False)
+df_moves["Contest"] = df_moves["Contest"].replace("???", "") # so the values are more intuitive
+
+df_moves["Power"] = pd.to_numeric(df_moves["Power"], errors="coerce").astype("Int64")
+df_moves["Accuracy"] = pd.to_numeric(df_moves["Accuracy"], errors="coerce").astype("Int64")
+
+df_pokemon.to_csv('db/data/processed/pokemon_clean.csv', index=False)
+df_moves.to_csv('db/data/processed/moves_clean.csv', index=False)
 
 print("transformed")
