@@ -1,5 +1,12 @@
 # code based on https://www.geeksforgeeks.org/python/how-to-execute-a-script-in-sqlite-using-python/
 import sqlite3
+import os
+
+outpath = "./db/data"
+
+if not os.path.exists(outpath):
+    os.makedirs(outpath)
+    print("folder created")
 
 con = sqlite3.connect("./db/data/dwh.db")
 

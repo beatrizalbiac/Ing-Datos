@@ -1,6 +1,9 @@
 import pandas as pd
 import requests
 import io
+import os
+
+outpath = "./db/data/raw"
 
 # ITS THE SAME EXACT CODE AS WHAT'S IN THE EDA NOTEBOOK (but I save the csvs to use them later)
 
@@ -10,6 +13,10 @@ urls = ["https://raw.githubusercontent.com/beatrizalbiac/Ing-Datos-datasets/refs
 # this is so they're each saved in their corresponding dataframe, and not just overwrite one df
 df_pokemon = None
 df_moves = None
+
+if not os.path.exists(outpath):
+    os.makedirs(outpath)
+    print("folder created")
 
 for i in urls:
     try:

@@ -1,7 +1,9 @@
+# I had to call it types_dim instead of just types bc that created a conflict with a python standard library also called types
+
 import pandas as pd
 import sqlite3
 
-def load_types(conn):
+def load_types(conn:sqlite3.Connection):
     cur = conn.cursor()
     df_moves = pd.read_csv("db/data/processed/moves_clean.csv")
 

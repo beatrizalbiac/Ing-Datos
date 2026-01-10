@@ -1,5 +1,12 @@
 import pandas as pd
 import ast
+import os
+
+outpath = "./db/data/processed"
+
+if not os.path.exists(outpath):
+    os.makedirs(outpath)
+    print("folder created")
 
 df_pokemon = pd.read_csv("db/data/raw/pokemon_raw.csv", sep=";")
 df_moves = pd.read_csv("db/data/raw/move_raw.csv")

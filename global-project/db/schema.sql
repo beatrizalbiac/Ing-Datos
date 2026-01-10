@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS dim_pokemon (
 
 CREATE TABLE IF NOT EXISTS dim_moves (
   move_id INTEGER PRIMARY KEY,
-  name TEXT UNIQUE NOT NULL,
+  name TEXT NOT NULL,
   type_id INTEGER NOT NULL REFERENCES dim_types(type_id),
   category TEXT NOT NULL,
   contest TEXT,
