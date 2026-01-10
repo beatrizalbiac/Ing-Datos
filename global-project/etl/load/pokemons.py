@@ -5,7 +5,7 @@ def load_pokemons(conn: sqlite3.Connection):
     cur = conn.cursor()
     df_pokemon = pd.read_csv("db/data/processed/pokemon_clean.csv")
 
-    cols = ["Name","Tier","HP","Attack","Defense","Special Attack","Special Defense","Speed","total_stats"]
+    cols = ["Name", "Tier", "HP", "Attack", "Defense", "Special Attack", "Special Defense", "Speed", "total_stats"]
     rows = list(df_pokemon[cols].itertuples(index=False, name=None))
 
     cur.executemany(

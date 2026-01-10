@@ -19,6 +19,17 @@ df_pokemon["Moves"] = df_pokemon["Moves"].apply(
     lambda moves: [m.replace("'", "-") for m in moves]
 )
 
+fixes = {
+    "Forest-s Curse": "Forest's Curse",
+    "King-s Shield": "King's Shield",
+    "Land-s Wrath": "Land's Wrath",
+    "Nature-s Madness": "Nature's Madness"
+}
+
+df_pokemon["Moves"] = df_pokemon["Moves"].apply(
+    lambda moves: [fixes.get(move, move) for move in moves]
+)
+
 df_pokemon["total_stats"] = df_pokemon[["HP", "Attack", "Defense", "Special Attack", "Special Defense", "Speed"]].sum(axis=1)
 
 df_moves["Contest"] = df_moves["Contest"].replace("???", "") # so the values are more intuitive
