@@ -11,13 +11,10 @@ if not os.path.exists(outpath):
 df_pokemon = pd.read_csv("db/data/raw/pokemon_raw.csv", sep=";")
 df_moves = pd.read_csv("db/data/raw/move_raw.csv")
 
-# I"ll parse the columns that are saved as lists
-df_pokemon["Types"] = df_pokemon["Types"].apply(ast.literal_eval)
-df_pokemon["Abilities"] = df_pokemon["Abilities"].apply(ast.literal_eval)
+# I'll parse the moves column so it's ready to be modified
 df_pokemon["Moves"] = df_pokemon["Moves"].apply(ast.literal_eval)
-df_pokemon["Next Evolution(s)"] = df_pokemon["Next Evolution(s)"].apply(ast.literal_eval)
 
-# to fix the - vs " thing so it"s the same accross all data 
+# to fix the - vs ' thing so it's the same accross all data 
 df_pokemon["Moves"] = df_pokemon["Moves"].apply(
     lambda moves: [m.replace("'", "-") for m in moves]
 )
