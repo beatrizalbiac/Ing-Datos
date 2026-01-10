@@ -8,6 +8,7 @@ from load.pokemons import load_pokemons
 from load.bridge_pokemon_types import load_bridge_pt
 from load.bridge_pokemon_abilities import load_bridge_pa
 from load.fact import load_fact
+from load.evolutions import update_evolutions
 
 
 conn = sqlite3.connect("db/data/dwh.db")
@@ -21,5 +22,6 @@ try:
     load_bridge_pt(conn)
     load_bridge_pa(conn)
     load_fact(conn)
+    update_evolutions(conn)
 finally:
     conn.close()
