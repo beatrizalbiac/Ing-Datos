@@ -1,0 +1,14 @@
+import pandas as pd
+import sqlite3
+
+def load_types(conn):
+    cur = conn.cursor()
+    df_moves = pd.read_csv("db/data/processed/moves_clean.csv")
+
+    types = sorted(df_moves["Type"].dropna().unique())
+
+    cur.executemany(
+        "insert or ignore into dim_types (type_name) values (?)",
+        [(t,) for t in types]
+    )
+    conn.commit()
