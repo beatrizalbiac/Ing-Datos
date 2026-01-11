@@ -20,9 +20,12 @@ def load_bridge_pt(conn: sqlite3.Connection):
             type_id = type_map.get(type_name)
 
             rows.append((pokemon_id, type_id, p))
+    
+    rows_total = len(rows)
 
     cur.executemany(
         "insert into bridge_pokemon_types(pokemon_id, type_id, type_position) values (?, ?, ?)" \
     " on conflict(pokemon_id, type_id) do nothing", rows)
 
     conn.commit()
+    return rows_total

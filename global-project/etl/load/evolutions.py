@@ -24,6 +24,9 @@ def update_evolutions(conn: sqlite3.Connection):
             # evo evolves from base
             rows.append((id, evo_id))
 
+    rows_total = len(rows)
+
     cur.executemany("update dim_pokemon set evolves_from_id = ? where pokemon_id = ?", rows)
 
     conn.commit()
+    return rows_total

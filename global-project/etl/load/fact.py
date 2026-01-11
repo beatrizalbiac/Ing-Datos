@@ -35,8 +35,11 @@ def load_fact(conn: sqlite3.Connection):
 
             rows.append((pokemon_id, move_id, is_stab))
 
+    rows_total = len(rows)
+
     cur.executemany(
         "insert into fact_pokemon_moves(pokemon_id, move_id, is_stab) values (?, ?, ?)" \
     " on conflict(pokemon_id, move_id) do nothing", rows)
 
     conn.commit()
+    return rows_total

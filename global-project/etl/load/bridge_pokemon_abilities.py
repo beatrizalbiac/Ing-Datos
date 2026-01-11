@@ -22,8 +22,11 @@ def load_bridge_pa(conn: sqlite3.Connection):
 
             rows.append((pokemon_id, ability_id))
 
+    rows_total = len(rows)
+
     cur.executemany(
         "insert into bridge_pokemon_abilities(pokemon_id, ability_id) values (?, ?)" \
     " on conflict(pokemon_id, ability_id) do nothing", rows)
 
     conn.commit()
+    return rows_total

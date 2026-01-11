@@ -15,8 +15,11 @@ def load_moves(conn: sqlite3.Connection):
     cols = ["Index", "Name", "type_id", "Category", "Contest", "Power", "Accuracy", "PP", "Generation"]
     rows = list(df_moves[cols].itertuples(index=False, name=None))
 
+    rows_total = len(rows)
+
     cur.executemany(
         "insert into dim_moves(move_id, name, type_id, category, contest, power, accuracy, pp, generation_number) values (?, ?, ?, ?, ?, ?, ?, ?, ?)" \
     " on conflict(move_id) do nothing", rows)
 
     conn.commit()
+    return rows_total

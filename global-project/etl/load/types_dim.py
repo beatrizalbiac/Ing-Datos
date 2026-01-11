@@ -9,8 +9,11 @@ def load_types(conn:sqlite3.Connection):
 
     types = sorted(df_moves["Type"].dropna().unique())
 
+    rows = len(types)
+
     cur.executemany(
         "insert or ignore into dim_types (type_name) values (?)",
         [(t,) for t in types]
     )
     conn.commit()
+    return rows

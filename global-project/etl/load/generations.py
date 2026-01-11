@@ -17,10 +17,14 @@ def load_generations(conn: sqlite3.Connection):
         (8, "Galar", 2019),
         (9, "Paldea", 2022),
     ]
+
+    rows = len(generations)
+
     cursor.executemany("insert into dim_generations(generation_number, region_name, release_year) values (?, ?, ?)" \
     " on conflict(generation_number) do nothing", generations)
     # I use the on conlict to nothing so it can be inserted only if it doesn't already exist, so it doesn't duplicate or overwrite things: https://hoelz.ro/blog/with-sqlite-insert-or-ignore-is-often-not-what-you-want
 
     conn.commit()
+    return rows
 
     # without the __init__.py it doesn't work
