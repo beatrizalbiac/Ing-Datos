@@ -25,10 +25,12 @@ def run(script_path: str):
     log.info(f"Starting {script_path}")
     start_time = datetime.datetime.now()
 
-    subprocess.run(
-        [sys.executable, str(ROOT / script_path)],
-        check=True
-    )
+    try:
+        subprocess.run([sys.executable, str(ROOT / script_path)], check=True)
+    except subprocess.CalledProcessError as e: # in case the pipelane fails
+        duration = datetime.datetime.now() - start_time
+        log.exception(f"FAILED {script_path} | Duration: {duration} | returncode={e.returncode}")
+        raise
 
     duration = datetime.datetime.now() - start_time
     log.info(f"Finished {script_path} | Duration: {duration}")

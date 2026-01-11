@@ -47,10 +47,13 @@ try:
 
     log.info(f"Total rows inserted into the data warehouse: {total_rows}")
 
+except Exception:
+    log.exception("Load failed with an unexpected error.")
+    raise
+
+finally:
+    conn.close()
     end_time = datetime.datetime.now()
     duration = end_time - start_time
     log.info(f"Load finished at {end_time}")
     log.info(f"Total duration: {duration}")
-
-finally:
-    conn.close()
