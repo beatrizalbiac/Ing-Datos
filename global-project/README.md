@@ -2,9 +2,21 @@
 *By Beatriz Albiac*
 
 ## 1. Project Overview
-This project goes over the design and implementation of a data engineering solution aplied to two datasets related to the competitive scene in the Japanese videogame: **Pokemon**. The project is centered aroung the organization and integration of the data in a structured way, so it can be analized and used efficiently later on.
+This project goes over the design and implementation of a complete *data engineering* solution that lets users analyze the competitive scene of the multiple games that form part of the Pokémon franchise. **The objective** is to allow players, both competitive and casual, to make informed decisions about the composition of their teams and their battle strategies using structured data.
 
-The project develops a data pipeline that integrates multiple datasets thanks to an ETL process, and stores them in a data warehouse focused on the analysis of the data. The solution (?) includes a daily run of the code, monitorization practices (logs and alerts), and the visualization of the data with graphs. On top of that, this document will go over things such as the scalability of the project, the costs of migrating it to the cloud, the use of AI to aid the process and the privacy concerns that may arise.
+The project works in a similar way to a well organized information management system: it collects data from different sources, tidies it up, and keeps it updated automatically so it is always ready to be used. Thanks to this, users can explore the data in a reliable way, identify patterns, and make better choices through clear data visualizations, such as interactive graphs, without needing to know a whole lot about the technical specifics.
+
+**Stated in more technical terms**, the project develops a *data pipeline* that integrates multiple datasets through an *ETL process (Extract, Transform, and Load)*. The data is stored in a *dimensionally modeled data warehouse*. The pipeline is executed automatically on a daily basis and is monitored through logs and alerts, which allow tracking what has happened and identifying whether any issues require attention. Finally, the data is made available to users through an interactive dashboard for visualization.
+
+This system allows us to answer **critical questions** such as:
+- Which combination of moves gives the best type coverage?
+- Which Pokémon are the most used in each competitive category?
+- Which Pokémon are the highest beneficiaries of the STAB buff?
+- Which Pokémon have the best stats?
+
+This information is crucial to build competitive teams and to analyze the popular strategies currently being used.
+
+This document also goes over the **business factors**; mainly, it focuses on the scalability of the project, the cost of migrating it to the cloud, the opportunities for AI integration, and the concerns about privacy that may arise, showing how the solution could evolve into a system ready for production.
 
 ## 2. Datasets
 ## 3. Architecture Overview
