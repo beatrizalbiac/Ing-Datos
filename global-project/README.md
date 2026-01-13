@@ -20,7 +20,7 @@ This document also covers the **business factors**; mainly, it focuses on the sc
 
 ## 2. Datasets
 
-In this project, two datasets are used. Both are centered around competitive data from the games, but they cover different aspects of it. They were chosen specifically because of how well related they are to one another, complementing each other. One of them describes the Pokémon themselves, while the other dives further into the moves used during battles. Together, they form the complete picture needed for competitive team building.
+In this project, two datasets are used. Both are centered around competitive data from the games, but they cover different aspects of it. They were chosen specifically because of how well related they are to one another, complementing each otherno. One of them describes the Pokémon themselves, while the other dives further into the moves used during battles. Together, they form the complete picture needed for competitive team building.
 
 It is like having two pages of instructions in a chess box: one shows all the pieces that exist and how they move, while the other shows the strategies and plays you can make with those pieces. You need both of them to understand how the game really works.
 
@@ -35,7 +35,7 @@ It is like having two pages of instructions in a chess box: one shows all the pi
 - **Types**: The type or types of the Pokémon, written as a *list of Strings*. There currently exist only 18 types.
 - **Abilities**: The abilities the Pokémon has, written as a *list of Strings*.
 - **Tier**: The competitive tier or category the Pokémon falls under, written as a *String*. The following tiers exist: LC, PU, NU, RU, OU, UU, Uber, UUBL, RUBL, NUBL, PUBL, Limbo, AG.
-    <p align="center">
+  <p align="center">
     <img width="500" height="444" alt="image (4)" src="https://github.com/user-attachments/assets/53145dc2-3f31-4c62-8841-2e9583658155" />
   </p>
   
@@ -68,9 +68,13 @@ It is like having two pages of instructions in a chess box: one shows all the pi
 - **Accuracy**: The chance of the move hitting its target, written as an *Integer* or *None* when accuracy is not defined.
 - **Gen**: The generation in which the move was introduced, written as an *Integer*.
 
-### 2.3 Extra mechanics that need further explanation
+### 2.3 Dataset Relationship and Extra Mechanics
+
+The two datasets are connected through the **Moves** attribute in the Pokémon dataset, which contains a list of move names that reference entries in the Moves dataset. This creates a many-to-many relationship that is essential for competitive analysis.<br><br>
+
+**Additional mechanics**
 - **STAB**: When a Pokémon uses a move that shares a type with it, there is an attack bonus of 50%.
-- **Total stats**: The sum of a Pokémon’s stats found in the Pokémon dataset. <br><br>
+- **Total stats**: The sum of a Pokémon’s stats found in the Pokémon dataset.<br><br>
 
 For users to build competitive teams easily, the following aspects have to be taken into account:
 - **Type coverage**: Each type has other types that it is strong or weak against.
@@ -80,16 +84,98 @@ For users to build competitive teams easily, the following aspects have to be ta
 
 
 ## 3. Architecture Overview
-## 4. Data Lifecycle Management
-## 5. ETL Design
-## 6. Data Warehouse Model
+This project implements a data architecture that transforms raw Pokémon data into an analytic database. The system is built around four main components that work together to move the data from the CSV files (the datasets) they come from to the data that users see and use.<br><br>
 
-<img width="1109" height="1103" alt="dimensional model" src="https://github.com/user-attachments/assets/506009c1-ab85-4de3-b332-bc8df4c16bfe" />
-done in https://dbdiagram.io/d
+**Main Components:**
+
+<p align="center">
+    <img width="661" height="61" alt="WORKFLOW BASE ID drawio" src="https://github.com/user-attachments/assets/66fc5287-b2b7-4c79-b1a5-f7a04b633953" />
+</p>
+
+1. **The source**: These are the base CSV files found in the other GitHub repository specifically created to store them. They contain the raw data, which is explored by the Python notebook included in the project. They act as the single source of truth.
+2. **ETL**: This is the processing system that manages the transformation of the data. It will be explained further later in the document.
+3. **Data warehouse**: This is a SQLite database with a dimensional model. It stores only cleaned and structured data.
+4. **Data consumption**: This layer allows interactive exploration of the data. It includes analytics and visualizations oriented toward the user.
+
+
+## 4. Data Lifecycle Management
+This project covers all phases of the data lifecycle, as shown in the previous diagram. Following what was covered in class, the data lifecycle follows this linear path: **Generation → Ingestion → Storage → Processing → Serving/Analysis**
+
+### 4.1 Generation
+As previously stated, the data is downloaded from the web, so it is not generated by the system itself. These CSV files are scraped from official web pages such as:
+- Smogon: https://www.smogon.com/dex/sm/pokemon/
+- Bulbapedia: https://bulbapedia.bulbagarden.net/wiki/List_of_moves
+
+### 4.2 Ingestion
+A batch ingestion approach is used, where data is collected in large groups (batches) over time and then moved, processed, and loaded into the system at scheduled intervals rather than in real time. The decision to use this approach relies on the fact that updates to the database are not frequent; updates are only required when a new game or generation is released or when changes occur in the competitive scene, which does not happen on a daily basis. The volume of data is also perfectly manageable, so this is not an issue. Additionally, batch ingestion is easier to implement than streaming systems.
+
+### 4.3 Storage
+There are three different iterations of data being stored: the raw CSV files, the cleaned CSV files, and the data processed into the data warehouse.<br><br>
+Storing the raw data allows the data to be reprocessed without having to download it again, and the same applies once the data has been transformed.
+
+### 4.4 Processing
+For this project, an ETL process was chosen instead of an ELT process. The main reason is that ETL validates data quality before it enters the data warehouse. It also reduces computational costs and keeps raw data separate for safety and traceability.
+
+### 4.5 Serving
+Data serving is done through interactive graphs and Looker Studio.
+
+## 5. ETL Design
+The pipeline, as explained before, transforms raw data into data ready to be loaded into the data warehouse, following this pattern: **Extract → Transform → Load**. In this case, there are some additional steps, but the main flow remains the same.
+
+**General flow:**
+<p align="center">
+    <img width="1238" height="221" alt="WORKFLOW BASE ID drawio (1)" src="https://github.com/user-attachments/assets/56553080-66b3-4359-9c73-d6de31a4c087" />
+</p>
+
+1. **Extract**: The data is downloaded from GitHub and saved into a raw folder.
+2. **Transform**:
+    1. The moves column is parsed, converting the data from a list of strings into a Python list.
+    2. Move names are standardized.
+    3. Total stats are calculated from the individual stats in the CSV files.
+    4. Required type conversions are applied.
+    5. Null values are cleaned when necessary; in this case, only when the Contest field has a `???` value.
+    6. The cleaned CSV files are stored in a processed folder.
+3. **Load**: Specific scripts are used to transform the cleaned CSV files into the structure required by the data warehouse, which is explained in the next section of the document. The order in which these scripts are executed is **crucial**, as some tables depend directly on others through foreign keys. The execution order is:
+    1. `dim_generations`
+    2. `dim_types`
+    3. `dim_moves`
+    4. `dim_abilities`
+    5. `dim_pokemon`
+    6. `bridge_pokemon_types`
+    7. `bridge_pokemon_abilities`
+    8. `fact_pokemon_moves`
+    9. Updates to `evolves_from_id` in `dim_pokemon`
+
+This process ensures that duplicate data is not inserted and that the pipeline can run smoothly.
+
+## 6. Data Warehouse Model
+The data warehouse uses a **Star Schema**, which is formed by a central table containing quantitative metrics (facts), surrounded by descriptive tables (dimensions) that provide context to the fact table, such as who, what, when, and where.
+
+<p align="center">
+    <img width="1109" height="1103" alt="dimensional model" src="https://github.com/user-attachments/assets/506009c1-ab85-4de3-b332-bc8df4c16bfe" />
+</p>
+
+_Done using https://dbdiagram.io/_
+
+The schema is composed of five dimension tables, two bridge tables used to represent many-to-many relationships, and one fact table.
+
+***All specifications defining the contents of each table are described in the `schema.sql` file.***
+
+The model is **partially denormalized** in order to optimize query performance:
+- Combat statistics such as HP, Attack, and Defense are stored directly in the `dim_pokemon` table instead of being separated into another table.
+- The `total_stats` attribute could be calculated through a query, but storing it directly simplifies analysis.
+
+The design prioritizes query performance, even if this introduces a small amount of redundancy in the data warehouse.
+
+This makes the data warehouse an **OLAP (Online Analytical Processing)** system because ...............................
+
+All dimensions follow a Slowly Changing Dimension (SCD) strategy between **Type 0 and Type 1**. Most of the data is not expected to change, but since game updates or competitive tier adjustments may occur, some attributes need to be updated. In these cases, the chosen approach is to overwrite existing values, which corresponds to an SCD Type 1 strategy.
 
 ## 7. Orchestration Strategy
 ## 8. Monitorization (logging and alerting)
 ## 10. Data Visualization (Looker Studio)
+This is just some query examples:
+https://lookerstudio.google.com/reporting/2e0886e6-69a9-4980-82a0-855841e56488
 ## 11. Data Insights
 ## 12. Scalability Analysis
 ## 13. Cloud Cost Estimation
