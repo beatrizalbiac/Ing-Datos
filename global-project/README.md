@@ -167,18 +167,125 @@ The model is **partially denormalized** in order to optimize query performance:
 
 The design prioritizes query performance, even if this introduces a small amount of redundancy in the data warehouse.
 
-This makes the data warehouse an **OLAP (Online Analytical Processing)** system because ...............................
+This makes the data warehouse an **OLAP (Online Analytical Processing)** system because it is designed for running analytical queries and reporting, not for handling frequent data updates like a transactional database would.
 
-All dimensions follow a Slowly Changing Dimension (SCD) strategy between **Type 0 and Type 1**. Most of the data is not expected to change, but since game updates or competitive tier adjustments may occur, some attributes need to be updated. In these cases, the chosen approach is to overwrite existing values, which corresponds to an SCD Type 1 strategy.
+All dimensions follow either a **Slowly Changing Dimension (SCD) strategy Type 0** or a **SCD Type 1**. Most of the data is not expected to change, but since game updates or competitive tier adjustments may occur, some attributes need to be updated. In these cases, the chosen approach is to overwrite existing values, which corresponds to an SCD Type 1 strategy.
 
 ## 7. Orchestration Strategy
+The pipeline orchestration is handled by a simple Python script called `main.py`. It runs the four ETL stages one after another: creating the database, extracting the data, transforming it, and loading it into the warehouse. If any stage fails, the whole pipeline stops immediately thanks to the `check=True` flag in `subprocess.run()`.
+
+Everything is logged to `logs/pipeline.log`, including timestamps and how long each stage took. This makes it easy to understand what happened if something goes wrong.
+
+This straightforward approach was chosen instead of using tools like Apache Airflow or cloud orchestrators because the pipeline is simple enough that it does not require advanced features such as parallel tasks or complex dependencies. The main advantage is that there is nothing extra to install or manage; it is just Python code that is easy to debug and run.
+
+### Daily Scheduling
+In a production environment, this pipeline should run automatically once a day. Here's how you'd set that up:
+
+**On Windows (using Task Scheduler):**
+Create a scheduled task that runs `python main.py` at the desired time each day.
+
+**On Linux/Mac (using cron):**
+```bash
+# runs every day at 2 AM
+0 2 * * * cd /path/to/project && python main.py >> logs/cron.log 2>&1
+```
+
+**Why once a day?** The competitive Pokémon meta does not change very frequently, so running the pipeline more often would not provide significant benefits. Daily batch processing is efficient and aligns well with the batch ingestion approach used throughout the project. It could even be less frequent (for example, once every three days) and still be fine.
+
+Since this is currently a local project, the pipeline is executed manually using `python main.py` when needed. However, the configuration above shows how it could be easily automated if required.
+
 ## 8. Monitorization (logging and alerting)
-## 10. Data Visualization (Looker Studio)
+The pipeline uses Python’s built in `logging` module to keep track of what happens during execution. Logging is used as the main monitoring mechanism, since it allows understanding both whether the pipeline ran correctly and where a problem occurred if something fails.
+
+Two different log files are generated for clarity, one that manages the whole pipeline flow, while the other manages the `load.py` flow regarding every script that conforms it. `pipeline.log` records when each ETL stage starts and finishes, how long it took, and any errors. `load.log` records how many rows were inserted into the warehouse and how long the loading took.
+
+Each log entry includes a timestamp, a severity level such as INFO or ERROR, and a short message describing what happened. This structure makes the logs easy to read and useful both for quick checks and for more detailed analysis when something goes wrong.
+
+### Alerting (Not Implemented)
+
+For this project, no automatic alerting system is implemented, as the pipeline is executed locally. In this context, manually checking the logs is sufficient.
+
+In a real production environment, alerting would be essential. For example, the system could send an email or a *Slack* message if the pipeline fails, including information about which stage failed and the associated error message. Alerts could also be triggered if the pipeline takes much longer than usual or if the number of rows loaded is very different from previous executions.
+
+Alerting is important because, without it, a failed pipeline might go unnoticed and result in outdated or incomplete data. Automated alerts allow problems to be detected early and fixed before they affect users. While this is not required for the current scope of the project, it would be a necessary addition in any production level deployment.
+
+## 9. Data Visualization (Looker Studio), and data insights
 This is just some query examples:
 https://lookerstudio.google.com/reporting/2e0886e6-69a9-4980-82a0-855841e56488
-## 11. Data Insights
-## 12. Scalability Analysis
-## 13. Cloud Cost Estimation
-## 14. AI Contribution
-## 15. Privacy Considerations
-## 16. How to Run the Project
+
+### Dashboard Contents
+
+The dashboard includes five visualizations designed to answer some of the key questions related to the competitive Pokémon scene:
+
+1. **Pokémon per Tier**: Shows the distribution of Pokémon across competitive tiers, highlighting which tiers contain the greatest variety.
+2. **Top 10 Highest Stats**: Displays the Pokémon with the highest total base stats, providing an overview of the strongest entries in terms of raw attributes.
+3. **Moves per Generation**: Illustrates how many moves were introduced in each generation, allowing comparison of design complexity across generations.
+4. **Best Stats per Tier**: Compares average base stats across competitive tiers, helping validate the relationship between Pokémon strength and tier placement.
+5. **Best Stats per Type**: Shows which Pokémon types have the highest aggregate stats, enabling comparisons between different type groups.
+
+Users can filter the visualizations by generation, type, or tier to explore specific subsets of the data. All charts update dynamically based on the selected filters.
+
+Overall, the dashboard allows users to analyze the competitive meta without requiring SQL knowledge, making it easier to identify trends and compare Pokémon across multiple criteria.<br>
+*There are way more graphs that could have been done, these are just a snippet to explain how it would work, and what the users would see*
+
+### Data Insights
+**Tier System Validation:**  
+The data confirms that Pokémon tiers are closely related to their stats. Pokémon in the AG tier have an average of around 730 total base stats, while Pokémon in lower tiers have much lower averages. Lower tiers such as PU and LC also contain many more Pokémon than the top tiers, which gives players more variety when building teams.
+
+**Power Creep:**  
+Mega Evolutions and Primal forms dominate the list of Pokémon with the highest total stats, all exceeding 700 points. Even so, Generation I introduced the highest number of moves, with around 170. Newer generations add fewer moves, suggesting that the game design has shifted away from adding new moves and toward improving or rebalancing existing mechanics.
+
+**Type Dominance:**  
+Water, Flying, and Psychic types have the highest combined stats overall, which helps explain why they appear so often in competitive play. In contrast, Rock and Bug types tend to have lower overall stats and are less dominant.
+
+**Data Quality:**  
+The main data quality issue encountered was inconsistent formatting of apostrophes in move names, such as `"Forest-s Curse"` versus `"Forest's Curse"`. Aside from this, the dataset was generally clean, with very few missing values. Missing Power or Accuracy values only occurred for status moves, which is expected behavior.
+
+**Value for Players:**  
+The data warehouse allows competitive players to quickly answer questions like *“Which are the best Water-type Pokémon in OU?”* or *“Which moves provide STAB for my team?”* without having to search through multiple websites. This significantly speeds up team-building analysis and decision-making.
+
+## 10. Scalability Analysis
+To evaluate how the system would behave if the amount of data increased, several growth scenarios were considered by multiplying the number of rows in the datasets. The goal is to understand both where the current design starts to struggle and how those limitations could be addressed.
+
+- **x10**: With ten times more data, the current solution would continue to work without major issues. The pipeline would take slightly longer to run, but performance would remain stable. In this case, the main action needed would be minor optimizations, such as grouping inserts into batches and avoiding unnecessary recalculations during the transformation step.
+
+- **x100**: At this scale, the increase in data becomes more noticeable. Transformation and loading steps would require more time, and analytical queries could start to slow down. To address this, performance improvements would focus on efficiency, such as using bulk operations consistently, adding indexes to frequently queried columns, and optimizing joins in the data warehouse.
+
+- **x1000**: When the data grows to this level, the limitations of SQLite become clear. Both data loading and query execution would slow down significantly, and concurrent access would not be well supported. The most appropriate solution at this point would be to migrate the data warehouse to a more robust relational database such as PostgreSQL, keeping the same star schema but benefiting from better performance and scalability.
+
+- **x10⁶**: With very large volumes of data, the current architecture would no longer be suitable. Processing everything on a single machine would not be realistic. To handle this scenario, the system would need to move to a cloud based setup, using object storage for files, scalable compute resources for ETL execution, and a managed analytical database capable of handling large scale queries.
+
+Overall, this analysis shows that the project not only works for the current dataset size, but also defines clear steps to address scalability issues as data grows, making future evolution of the system easier to plan and justify.
+
+## 11. Cloud Cost Estimation
+
+To estimate the cost of migrating this project to the cloud, AWS was selected as the reference cloud provider. The estimation was performed using the AWS Pricing Calculator and focuses on the main components required by the system: object storage for raw and processed data using Amazon S3, and a managed relational database for analytical queries using Amazon RDS with PostgreSQL.
+
+<p align="center">
+    <img width="3550" height="945" alt="image" src="https://github.com/user-attachments/assets/6fc84db4-89e3-49c8-b103-4a00a049d0eb" />
+</p>
+The picture shows the estimated monthly cost for a small-scale deployment, assuming 10 GB of storage in S3 and a small PostgreSQL RDS instance. Under these conditions, the estimated monthly cost is approximately 20$, resulting in a yearly cost of around 250$. (These data was just an estimation and in no way is 100% accurate)
+
+Based on this baseline, different data growth scenarios can be considered:
+
+- **x10**: With ten times more data, storage requirements increase slightly, while compute and database resources remain mostly unchanged. The estimated monthly cost would increase marginally and remain well below 30$.
+
+- **x100**: At this scale, storage costs become more noticeable, and the database may require additional resources. Even so, the total monthly cost would still remain relatively low, likely within the range of a few tens of dollars.
+
+- **x1000**: With a significantly larger volume of data, both storage and database resources would need to scale. This would require a larger database instance and increased storage capacity, pushing monthly costs into the range of several tens to low hundreds of dollars.
+
+- **x10⁶**: At very large scale, costs increase substantially. Scalable storage, more powerful database instances, and potentially additional compute resources would be required. In this scenario, monthly costs could reach several hundreds of dollars, depending on usage patterns and optimization decisions.
+
+These values are not intended to represent exact production costs, but rather to provide an order-of-magnitude estimation. This analysis shows that cloud migration is affordable at small and medium scales, while cost becomes a key factor as data volume grows, reinforcing the importance of scalability planning.
+
+
+## 12. AI Contribution
+Artificial Intelligence could support this project mainly at the analysis and data quality stages. For example, AI models could be used to detect unusual changes in Pokémon usage or move popularity over time, helping identify shifts in the competitive meta. AI could also assist in validating incoming data by automatically flagging inconsistencies or missing values during the transformation process, reducing the need for manual checks and improving overall data reliability.
+
+## 13. Privacy Considerations
+This project uses only publicly available data related to Pokémon game mechanics and competitive usage. No personal or sensitive user data is collected, stored, or processed.
+
+As a result, privacy risks are minimal and no specific privacy protection measures are required. If user data were to be introduced in the future, appropriate privacy and data protection mechanisms would need to be considered. But introducing user data would make no sense.
+
+## 14. What I would have done differently if I were to start again
+I would choose to save the data warehouse into PostgreSQL instead of SQLite, as trying to make the dashboard in Looker studio, and calculate the could costs in AWS was a pain, and I would end up having to migrate it anyways.
