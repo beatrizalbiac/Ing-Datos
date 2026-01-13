@@ -238,9 +238,6 @@ Mega Evolutions and Primal forms dominate the list of Pokémon with the highest 
 **Type Dominance:**  
 Water, Flying, and Psychic types have the highest combined stats overall, which helps explain why they appear so often in competitive play. In contrast, Rock and Bug types tend to have lower overall stats and are less dominant.
 
-**Data Quality:**  
-The main data quality issue encountered was inconsistent formatting of apostrophes in move names, such as `"Forest-s Curse"` versus `"Forest's Curse"`. Aside from this, the dataset was generally clean, with very few missing values. Missing Power or Accuracy values only occurred for status moves, which is expected behavior.
-
 **Value for Players:**  
 The data warehouse allows competitive players to quickly answer questions like *“Which are the best Water-type Pokémon in OU?”* or *“Which moves provide STAB for my team?”* without having to search through multiple websites. This significantly speeds up team-building analysis and decision-making.
 
